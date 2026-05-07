@@ -24,8 +24,7 @@ const CONFIG = {
 
   // Server configuration
   SERVER_URL: process.env.SERVER_URL || 'https://fallon-zincy-derek.ngrok-free.dev',
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
-
+  FRONTEND_URL: process.env.FRONTEND_URL || 'https://lunurise-backend.onrender.com',
   // ============================================
   // FX RATE: USD → NGN
   // NEKpay expects amounts in Naira.
