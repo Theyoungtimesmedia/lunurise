@@ -9,7 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'https://lunurise-backend.onrender.com';
+// Or use environment variable:
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://lunurise-backend.onrender.com';
+
 
 const PaymentModalNEKpay = ({ 
   isOpen, 
