@@ -21,6 +21,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import CryptoApproval from "./pages/admin/CryptoApproval";
 import NotFound from "./pages/NotFound";
 import CryptoDeposit from "./pages/CryptoDeposit";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ const AppRoutes = () => (
     <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
     <Route path="/my-team" element={<ProtectedRoute><MyTeam /></ProtectedRoute>} />
     <Route path="/crypto-deposit" element={<ProtectedRoute><CryptoDeposit /></ProtectedRoute>} />
+	    <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
     <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
     <Route path="/admin/crypto-approval" element={<ProtectedRoute><CryptoApproval /></ProtectedRoute>} />
     
