@@ -24,7 +24,7 @@ const CONFIG = {
   NEKPAY_CREATE_ORDER_ENDPOINT: '/pay/web',
   NEKPAY_QUERY_ORDER_ENDPOINT: '/query/order',
   
-  // For a combined server, the SERVER_URL and FRONTEND_URL are the same
+  // For a combined server, the BASE_URL is your Render URL
   BASE_URL: process.env.RENDER_EXTERNAL_URL || 'https://lunurise-backend.onrender.com',
   USD_TO_NGN_RATE: parseFloat(process.env.USD_TO_NGN_RATE) || 1600,
   NEKPAY_MIN_AMOUNT_NGN: 500,
@@ -44,7 +44,13 @@ function generateSignature(params, secretKey) {
 }
 
 function formatNEKpayDate(date = new Date()) {
-  return date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 // ============================================
@@ -53,7 +59,14 @@ function formatNEKpayDate(date = new Date()) {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'healthy', 
+    mode: 'production',
+    baseUrl: CONFIG.NEKPAY_BASE_URL,
+    merchantId: CONFIG.NEKPAY_MERCHANT_ID,
+    fxRate: CONFIG.USD_TO_NGN_RATE,
+    timestamp: new Date().toISOString() 
+  });
 });
 
 // Create payment
@@ -88,7 +101,14 @@ app.post('/api/nekpay/create-payment', async (req, res) => {
       body: formBody
     });
 
-    const result = await response.json();
+    const responseText = await response.text();
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (e) {
+      throw new Error(`Invalid JSON response: ${responseText}`);
+    }
+
     if (result.respCode === 'SUCCESS' && result.tradeResult === '1') {
       res.json({ code: 0, msg: 'success', data: { mchOrderNo: result.mchOrderNo, payUrl: result.payInfo } });
     } else {
@@ -136,11 +156,12 @@ app.post('/api/nekpay/notify', (req, res) => {
 // SERVE FRONTEND (React App)
 // ============================================
 
-// Serve static files from the "dist" directory (created by npm run build)
+// Serve static files from the "dist" directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Handle React routing, return all requests to React app
-app.get('*', (req, res) => {
+// ✅ FIXED: Wildcard route for React routing
+// Use (.*) instead of * to avoid PathError in newer Express/path-to-regexp versions
+app.get('(.*)', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
